@@ -27,8 +27,7 @@ public class DocPage {
 	
 	public void init() 
 	{
-		System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir")+File.separator+"Drivers" + File.separator
-				+ "chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir")+"\\Drivers\\chromedriver.exe");
 		driver = new ChromeDriver();
 		wait = new WebDriverWait(driver, 60);
 		driver.manage().window().maximize();
@@ -37,7 +36,7 @@ public class DocPage {
 	public String launchURL(String URL) 
 	{
 		driver.get(URL);
-		pageTitle = driver.getTitle();
+		getPageTitle = driver.getTitle();
 		System.out.println("Page Title is:" +getPageTitle);
 		return getPageTitle;
 	}
@@ -46,8 +45,10 @@ public class DocPage {
 		
 		List<WebElement> links = driver.findElements(By.xpath(xPath));
 		
-		for(WebElement link : links) 
+		for(int i=0; i<links.size(); i++)
 		{
+			links = driver.findElements(By.xpath(xPath));
+			WebElement link = links.get(i);
 			String url = link.getAttribute("href");
 			try 
 			{
@@ -65,14 +66,13 @@ public class DocPage {
 					JavascriptExecutor js = (JavascriptExecutor)driver;
 					System.out.println("URL : "+url);
 					System.out.println("Response Code : "+respCode);
-				    link.sendKeys(Keys.DOWN , Keys.CONTROL , Keys.ENTER);
-				    ArrayList<String> tabs2 = new ArrayList<String> (driver.getWindowHandles());
-				    driver.switchTo().window(tabs2.get(1));
-				    Thread.sleep(20);
+				    link.click();
+				    Thread.sleep(2000);
 					Boolean falg = Boolean.valueOf((Boolean) js.executeScript("return (window.angular !== undefined) && (angular.element(document).injector() !== undefined) && (angular.element(document).injector().get('$http').pendingRequests.length === 0)"));
 					if(falg == true) 
 					{
 						System.out.println("Angular JS loaded on the page : "+url+"\n");
+						driver.navigate().back();
 					}
 					else 
 					{
@@ -86,17 +86,13 @@ public class DocPage {
 					    {
 							System.out.println("Assertion error. "+e.getMessage());
 					    }
-					}
-					driver.close();
-				    driver.switchTo().window(tabs2.get(0));
-					
-					}
+					}			
+				}
 				System.out.println("\n");
 			}catch(Exception e) {
 				
 			}
 		}
-		
+	driver.close();		
 	}
-
 }
